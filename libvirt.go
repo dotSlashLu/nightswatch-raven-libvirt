@@ -75,21 +75,27 @@ func getStats(c *libvirt.Connect) ([]*libvirt.Domain,
 func processRes(p *ri.Plugin,
 	domPtrs []*libvirt.Domain, stats []libvirt.DomainStats) error {
 	// generated metrics:
-	// <machine>.vm.<n>.<name, uuid>
-	// <machine>.vm.<n>.<stats name>
+	// <machine>.vm.<uuid>.<name, uuid>
+	// <machine>.vm.<uuid>.<stats name>
 	// <machine>.vm.count
 	p.SingleReport(ri.ReportValInt, "vm.count", len(domPtrs))
 	for _, dom := range domPtrs {
+		domName, _ := dom.GetName()
+		domUUID, _ := dom.GetUUIDString()
+		kPrefix := "vm." + domUUID
+
+		// name
+		nameStr := fmt.Sprintf("%s.%s", kPrefix, "name")
+		p.SingleReport(ri.ReportValStr, nameStr, domName)
+
+		// id
 		domID, err := dom.GetID()
 		if err != nil {
 			return err
 		}
-		fmt.Printf("domID %v\n", domID)
-		domName, _ := dom.GetName()
-		domUUID, _ := dom.GetUUIDString()
-		kPrefix := "vm." + strconv.Itoa(int(domID)) + "."
-		p.SingleReport(ri.ReportValStr, kPrefix + "name", domName)
-		p.SingleReport(ri.ReportValStr, kPrefix + "uuid", domUUID)
+		domIDString := strconv.Itoa(int(domID))
+		idStr := fmt.Sprintf("%s.%s", kPrefix, "id")
+		p.SingleReport(ri.ReportValStr, idStr, domIDString)
 	}
 	return nil
 }
