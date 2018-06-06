@@ -5,7 +5,7 @@ import (
 	"time"
 	"strconv"
 	"github.com/libvirt/libvirt-go"
-	ri "github.com/dotSlashLu/nightswatch/raven_interface"
+	ri "github.com/dotSlashLu/nightswatch/agent/raven_interface"
 )
 
 const pluginName = "libvirt"
